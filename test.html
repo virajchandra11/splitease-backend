@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SplitEase API Tester</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #667eea;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        button.danger {
+            background: #e53e3e;
+        }
+        button.danger:hover {
+            background: #c53030;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #result {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .expense-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 SplitEase API Tester</h1>
+    
+    <div class="stats" id="stats"></div>
+    
+    <div class="expense-form">
+        <h2>Create Custom Expense</h2>
+        <div class="form-group">
+            <label>Description:</label>
+            <input type="text" id="description" placeholder="e.g., Dinner at Luigi's" value="Dinner">
+        </div>
+        <div class="form-group">
+            <label>Total Amount:</label>
+            <input type="number" id="amount" placeholder="100" value="100">
+        </div>
+        <div class="form-group">
+            <label>Number of People:</label>
+            <input type="number" id="peopleCount" placeholder="3" value="3" min="1" max="10">
+        </div>
+        <button onclick="createCustomExpense()">Create Custom Expense</button>
+    </div>
+
+    <div class="button-group">
+        <button onclick="getExpenses()">📋 Get All Expenses</button>
+        <button onclick="getStats()">📊 Get Stats</button>
+        <button onclick="clearResult()">🗑️ Clear Display</button>
+        <button onclick="testPaymentLink()">💳 Test Payment Link</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        // Load stats on page load
+        window.onload = function() {
+            getStats();
+        };
+
+        async function createCustomExpense() {
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const peopleCount = parseInt(document.getElementById('peopleCount').value);
+            
+            const participants = [];
+            const amountPerPerson = amount / peopleCount;
+            
+            for (let i = 1; i <= peopleCount; i++) {
+                participants.push({
+                    name: `Person ${i}`,
+                    email: `person${i}@email.com`,
+                    amount: amountPerPerson
+                });
+            }
+            
+            const response = await fetch('http://localhost:3000/api/expenses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    description: description,
+                    amount: amount,
+                    participants: participants,
+                    createdBy: 'API Tester'
+                })
+            });
+            
+            const result = await response.json();
+            document.getElementById('result').innerHTML = 
+                '<h3>✅ Expense Created!</h3>' +
+                '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            
+            // Refresh stats
+            getStats();
+        }
+
+        async function getExpenses() {
+            const response = await fetch('http://localhost:3000/api/expenses');
+            const result = await response.json();
+            
+            document.getElementById('result').innerHTML = 
+                `<h3>📋 All Expenses (${result.count} total)</h3>` +
+                '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        }
+
+        async function getStats() {
+            const response = await fetch('http://localhost:3000/api/stats');
+            const result = await response.json();
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${result.stats.totalExpenses}</div>
+                    <div class="stat-label">Total Expenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$${result.stats.totalAmount.toFixed(2)}</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${result.stats.totalPending}</div>
+                    <div class="stat-label">Pending Payments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${result.stats.totalPaid}</div>
+                    <div class="stat-label">Completed Payments</div>
+                </div>
+            `;
+            
+            document.getElementById('stats').innerHTML = statsHTML;
+        }
+
+        async function testPaymentLink() {
+            // First, get the expenses to find a payment link
+            const response = await fetch('http://localhost:3000/api/expenses');
+            const data = await response.json();
+            
+            if (data.expenses.length > 0) {
+                // Get the first payment link from the most recent expense
+                const lastExpense = data.expenses[data.expenses.length - 1];
+                const firstParticipant = lastExpense.participants[0];
+                const paymentLinkId = firstParticipant.paymentLinkId;
+                
+                // Now fetch the payment link details
+                const linkResponse = await fetch(`http://localhost:3000/api/payment-links/${paymentLinkId}`);
+                const linkData = await linkResponse.json();
+                
+                document.getElementById('result').innerHTML = 
+                    `<h3>💳 Payment Link Details</h3>` +
+                    `<p>This is what ${firstParticipant.name} would see:</p>` +
+                    '<pre>' + JSON.stringify(linkData, null, 2) + '</pre>' +
+                    `<p>Payment Link URL: <code>http://localhost:3000/api/payment-links/${paymentLinkId}</code></p>` +
+                    `<button onclick="simulatePayment('${paymentLinkId}')">Simulate Payment</button>`;
+            } else {
+                document.getElementById('result').innerHTML = 
+                    '<h3>❌ No expenses found</h3>' +
+                    '<p>Create an expense first!</p>';
+            }
+        }
+
+        async function simulatePayment(paymentLinkId) {
+            const response = await fetch(`http://localhost:3000/api/payment-links/${paymentLinkId}/pay`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    paymentMethod: 'Apple Pay'
+                })
+            });
+            
+            const result = await response.json();
+            document.getElementById('result').innerHTML = 
+                '<h3>💰 Payment Processed!</h3>' +
+                '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            
+            // Refresh stats
+            getStats();
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

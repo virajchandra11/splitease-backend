@@ -39,6 +39,16 @@ const PORT = 3000;
 
 // Middleware
 app.use(cors()); // Allows your frontend to talk to this backend
+
+// Serve the frontend HTML file
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Add this at the top with other requires
+const path = require('path');
+
+
 app.use(express.json()); // Allows server to understand JSON data
 
 // In-memory storage (temporary - will reset when server restarts)

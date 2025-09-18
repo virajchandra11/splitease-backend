@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SplitEase - Split Bills Effortlessly</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .status {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .participants {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .participants label {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e8e8e8;
+            gap: 10px;
+        }
+
+        .participant input {
+            margin: 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .participant input:first-child {
+            flex: 2;
+        }
+
+        .participant input:nth-child(2) {
+            flex: 2;
+        }
+
+        .participant .amount {
+            min-width: 80px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: right;
+            font-size: 16px;
+        }
+
+        .remove-participant {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .add-participant {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .add-participant:hover {
+            background: #5a6fd8;
+        }
+
+        .create-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: transform 0.2s;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .expense-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .expense-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .expense-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .expense-details {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .payment-links {
+            margin-top: 15px;
+        }
+
+        .payment-link {
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-link .person-info {
+            flex: 1;
+        }
+
+        .payment-link .name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .payment-link .email {
+            font-size: 13px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .payment-link .amount {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .copy-link {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .copy-link:hover {
+            background: #5a6fd8;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success-message h3 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .copy-success {
+            background: #56ab2f !important;
+            color: white !important;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .participant {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .participant input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SplitEase</h1>
+            <p>Split expenses without the hassle</p>
+        </div>
+        
+        <div class="status">
+            🟢 Connected to Live API
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('create', this)">Create</button>
+            <button class="tab" onclick="switchTab('history', this)">History</button>
+            <button class="tab" onclick="switchTab('settle', this)">Settle Up</button>
+        </div>
+
+        <!-- Create Expense View -->
+        <div id="create" class="view active">
+            <div class="content">
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="description">What's this expense for?</label>
+                        <input type="text" id="description" placeholder="Dinner, groceries, movie tickets..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Total Amount ($)</label>
+                        <input type="number" id="amount" step="0.01" placeholder="0.00" required min="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="splitType">How to split?</label>
+                        <select id="splitType" onchange="updateSplitType()">
+                            <option value="equal">Split equally</option>
+                            <option value="percentage">By percentage</option>
+                            <option value="amount">By specific amounts</option>
+                        </select>
+                    </div>
+
+                    <div class="participants">
+                        <label>Who's involved?</label>
+                        <div id="participantsList">
+                            <div class="participant">
+                                <input type="text" placeholder="Name" required>
+                                <input type="email" placeholder="Email (optional)">
+                                <div class="amount">$0.00</div>
+                            </div>
+                            <div class="participant">
+                                <input type="text" placeholder="Name" required>
+                                <input type="email" placeholder="Email (optional)">
+                                <div class="amount">$0.00</div>
+                            </div>
+                        </div>
+                        <button type="button" class="add-participant" onclick="addParticipant()">+ Add Person</button>
+                    </div>
+
+                    <button type="submit" class="create-btn" id="submitBtn">Create Expense & Generate Links</button>
+                </form>
+
+                <div id="successMessage" class="success-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="history" class="view">
+            <div class="content">
+                <div id="expenseHistory" class="loading">Loading expenses...</div>
+            </div>
+        </div>
+
+        <!-- Settle Up View -->
+        <div id="settle" class="view">
+            <div class="content">
+                <div id="settleUpContent">
+                    <div class="empty-state">
+                        <h3>💰 Settlement Calculator</h3>
+                        <p>This feature will calculate who owes what to whom and suggest the minimum number of transactions needed to settle all debts.</p>
+                        <p><strong>Coming in the next update!</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration - points to your live backend!
+        const API_BASE = window.location.origin + '/api';
+        
+        let expenses = [];
+
+        // Tab switching function
+        function switchTab(tabName, tabElement) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            tabElement.classList.add('active');
+            
+            // Update views
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'history') {
+                loadExpenseHistory();
+            } else if (tabName === 'settle') {
+                loadSettleUp();
+            }
+        }
+
+        // Add participant function
+        function addParticipant() {
+            const participantsList = document.getElementById('participantsList');
+            const participantDiv = document.createElement('div');
+            participantDiv.className = 'participant';
+            participantDiv.innerHTML = `
+                <input type="text" placeholder="Name" required>
+                <input type="email" placeholder="Email (optional)">
+                <div class="amount">$0.00</div>
+                <button type="button" class="remove-participant" onclick="removeParticipant(this)">×</button>
+            `;
+            participantsList.appendChild(participantDiv);
+            updateParticipantAmounts();
+        }
+
+        // Remove participant function
+        function removeParticipant(button) {
+            const participantsList = document.getElementById('participantsList');
+            if (participantsList.children.length > 1) {
+                button.parentElement.remove();
+                updateParticipantAmounts();
+            }
+        }
+
+        // Update split type
+        function updateSplitType() {
+            updateParticipantAmounts();
+        }
+
+        // Update participant amounts based on total and split type
+        function updateParticipantAmounts() {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const splitType = document.getElementById('splitType').value;
+            const participants = document.querySelectorAll('.participant');
+            
+            if (splitType === 'equal' && participants.length > 0) {
+                const amountPerPerson = amount / participants.length;
+                participants.forEach(participant => {
+                    const amountDiv = participant.querySelector('.amount');
+                    amountDiv.textContent = `$${amountPerPerson.toFixed(2)}`;
+                });
+            }
+        }
+
+        // Create expense function
+        async function createExpense(expenseData) {
+            try {
+                console.log('Creating expense:', expenseData);
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(expenseData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', errorText);
+                    throw new Error(`Failed to create expense: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Expense created successfully:', result);
+                return result;
+            } catch (error) {
+                console.error('Error creating expense:', error);
+                throw error;
+            }
+        }
+
+        // Load expense history
+        async function loadExpenseHistory() {
+            try {
+                console.log('Loading expense history...');
+                const response = await fetch(`${API_BASE}/expenses`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const expenses = await response.json();
+                console.log('Loaded expenses:', expenses);
+                
+                const historyDiv = document.getElementById('expenseHistory');
+                
+                if (expenses.length === 0) {
+                    historyDiv.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No expenses yet</h3>
+                            <p>Create your first expense to get started!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                historyDiv.innerHTML = expenses.map(expense => `
+                    <div class="expense-item">
+                        <div class="expense-header">
+                            <div class="expense-title">${expense.description}</div>
+                            <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
+                        </div>
+                        <div class="expense-details">
+                            Split among ${expense.participants.length} people • ${new Date(expense.createdAt).toLocaleDateString()}
+                        </div>
+                        <div class="payment-links">
+                            ${expense.participants.map(p => `
+                                <div class="payment-link">
+                                    <div class="person-info">
+                                        <div class="name">${p.name}</div>
+                                        ${p.email ? `<div class="email">${p.email}</div>` : ''}
+                                    </div>
+                                    <div class="amount">$${p.amount.toFixed(2)}</div>
+                                    <button class="copy-link" onclick="copyPaymentLink('${p.paymentLink}', this)">Copy Link</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+                document.getElementById('expenseHistory').innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading expenses</h3>
+                        <p>Please check your connection and try again</p>
+                        <p><small>Error: ${error.message}</small></p>
+                    </div>
+                `;
+            }
+        }
+
+        // Copy payment link function
+        function copyPaymentLink(linkId, button) {
+            const fullLink = `${window.location.origin}/payment/${linkId}`;
+            
+            navigator.clipboard.writeText(fullLink).then(() => {
+                // Visual feedback
+                const originalText = button.textContent;
+                const originalClass = button.className;
+                
+                button.textContent = '✓ Copied!';
+                button.classList.add('copy-success');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.className = originalClass;
+                }, 2000);
+                
+            }).catch(err => {
+                console.error('Failed to copy link:', err);
+                alert('Failed to copy link. Please try again.');
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            try {
+                const description = document.getElementById('description').value.trim();
+                const amount = parseFloat(document.getElementById('amount').value);
+                const splitType = document.getElementById('splitType').value;
+                
+                // Get participants
+                const participantInputs = document.querySelectorAll('.participant');
+                const participants = Array.from(participantInputs).map(participant => {
+                    const name = participant.querySelector('input[type="text"]').value.trim();
+                    const email = participant.querySelector('input[type="email"]').value.trim();
+                    return { 
+                        name, 
+                        email: email || null 
+                    };
+                }).filter(p => p.name);
+                
+                if (participants.length === 0) {
+                    alert('Please add at least one participant with a name');
+                    return;
+                }
+                
+                if (!description) {
+                    alert('Please enter a description for the expense');
+                    return;
+                }
+                
+                if (amount <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+                
+                const expenseData = {
+                    description,
+                    amount,
+                    participants,
+                    splitType
+                };
+                
+                console.log('Submitting expense data:', expenseData);
+                const result = await createExpense(expenseData);
+                
+                // Show success message
+                const successDiv = document.getElementById('successMessage');
+                successDiv.innerHTML = `
+                    <h3>✅ Expense Created Successfully!</h3>
+                    <p><strong>${description}</strong> for $${amount.toFixed(2)} has been split among ${participants.length} people.</p>
+                    <p>Payment links have been generated! Check the <strong>History</strong> tab to copy and share them.</p>
+                `;
+                successDiv.style.display = 'block';
+                
+                // Reset form
+                e.target.reset();
+                
+                // Reset participants list to default (2 people)
+                document.getElementById('participantsList').innerHTML = `
+                    <div class="participant">
+                        <input type="text" placeholder="Name" required>
+                        <input type="email" placeholder="Email (optional)">
+                        <div class="amount">$0.00</div>
+                    </div>
+                    <div class="participant">
+                        <input type="text" placeholder="Name" required>
+                        <input type="email" placeholder="Email (optional)">
+                        <div class="amount">$0.00</div>
+                    </div>
+                `;
+                
+                // Scroll to success message
+                successDiv.scrollIntoView({ behavior: 'smooth' });
+                
+                // Hide success message after 8 seconds
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 8000);
+                
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert(`Error creating expense: ${error.message}`);
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Listen for amount changes
+        document.getElementById('amount').addEventListener('input', updateParticipantAmounts);
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('SplitEase app loaded');
+            console.log('API Base URL:', API_BASE);
+            updateParticipantAmounts();
+        });
+    </script>
+</body>
+</html>

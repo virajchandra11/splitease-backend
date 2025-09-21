@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            margin: 0;
         }
 
         .container {
@@ -25,6 +26,127 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
+            min-height: 600px;
+        }
+
+        /* Auth Screens Styles */
+        .auth-screens {
+            width: 100%;
+            height: 100%;
+        }
+
+        .auth-screen {
+            display: none;
+            width: 100%;
+            min-height: 600px;
+        }
+
+        .auth-screen.active {
+            display: block;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .auth-header h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .auth-buttons {
+            padding: 40px 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .auth-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .auth-btn.secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #e8e8e8;
+        }
+
+        .auth-btn.secondary:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .auth-features {
+            padding: 20px 30px 40px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .auth-switch {
+            text-align: center;
+            padding: 20px 30px;
+            color: #666;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .link-btn:hover {
+            color: #5a6fd8;
+        }
+
+        /* Main App Styles */
+        .main-app {
+            width: 100%;
+            height: 100%;
         }
 
         .header {
@@ -134,6 +256,12 @@
         .participants label {
             margin-bottom: 15px;
             color: #333;
+        }
+
+        .helper-text {
+            font-size: 13px;
+            color: #666;
+            font-weight: 400;
         }
 
         .participant {
@@ -376,83 +504,192 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>SplitEase</h1>
-            <p>Split expenses without the hassle</p>
-        </div>
-        
-        <div class="status">
-            🟢 Connected to Live API
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('create', this)">Create</button>
-            <button class="tab" onclick="switchTab('history', this)">History</button>
-            <button class="tab" onclick="switchTab('settle', this)">Settle Up</button>
-        </div>
-
-        <!-- Create Expense View -->
-        <div id="create" class="view active">
-            <div class="content">
-                <form id="expenseForm">
-                    <div class="form-group">
-                        <label for="description">What's this expense for?</label>
-                        <input type="text" id="description" placeholder="Dinner, groceries, movie tickets..." required>
+        <!-- Auth Screens (shown when not logged in) -->
+        <div id="authScreens" class="auth-screens">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="auth-screen active">
+                <div class="auth-header">
+                    <h2>Welcome to SplitEase</h2>
+                    <p>Split expenses without the hassle. Get started in seconds.</p>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button class="auth-btn primary" onclick="showAuthForm('signup')">
+                        Create Account
+                    </button>
+                    <button class="auth-btn secondary" onclick="showAuthForm('login')">
+                        I have an account
+                    </button>
+                </div>
+                
+                <div class="auth-features">
+                    <div class="feature">
+                        <span class="feature-icon">📱</span>
+                        <span>No passwords needed</span>
                     </div>
-
-                    <div class="form-group">
-                        <label for="amount">Total Amount ($)</label>
-                        <input type="number" id="amount" step="0.01" placeholder="0.00" required min="0.01">
+                    <div class="feature">
+                        <span class="feature-icon">🔗</span>
+                        <span>Share links, not apps</span>
                     </div>
-
-                    <div class="form-group">
-                        <label for="splitType">How to split?</label>
-                        <select id="splitType" onchange="updateSplitType()">
-                            <option value="equal">Split equally</option>
-                            <option value="percentage">By percentage</option>
-                            <option value="amount">By specific amounts</option>
-                        </select>
+                    <div class="feature">
+                        <span class="feature-icon">💰</span>
+                        <span>Track everything</span>
                     </div>
+                </div>
+            </div>
 
-                    <div class="participants">
-                        <label>Who's involved?</label>
-                        <div id="participantsList">
-                            <div class="participant">
-                                <input type="text" placeholder="Name" required>
-                                <input type="email" placeholder="Email (optional)">
-                                <div class="amount">$0.00</div>
-                            </div>
-                            <div class="participant">
-                                <input type="text" placeholder="Name" required>
-                                <input type="email" placeholder="Email (optional)">
-                                <div class="amount">$0.00</div>
-                            </div>
+            <!-- Auth Form Screen -->
+            <div id="authFormScreen" class="auth-screen">
+                <div class="auth-header">
+                    <h2 id="authTitle">Create Account</h2>
+                    <p id="authSubtitle">Enter your phone number or email to get started</p>
+                </div>
+                
+                <div class="content">
+                    <form id="authForm">
+                        <div class="form-group" id="nameGroup">
+                            <label for="authName">Your Name</label>
+                            <input type="text" id="authName" placeholder="John Doe" required>
                         </div>
-                        <button type="button" class="add-participant" onclick="addParticipant()">+ Add Person</button>
+                        
+                        <div class="form-group">
+                            <label for="authContact">Phone Number or Email</label>
+                            <input type="text" id="authContact" placeholder="+1 (555) 123-4567 or john@example.com" required>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn primary" id="authSubmitBtn">
+                            Send Verification Code
+                        </button>
+                    </form>
+                    
+                    <div class="auth-switch">
+                        <span id="authSwitchText">Already have an account?</span>
+                        <button type="button" class="link-btn" id="authSwitchBtn" onclick="toggleAuthMode()">
+                            Sign In
+                        </button>
                     </div>
+                    
+                    <button type="button" class="link-btn" onclick="showWelcome()">
+                        ← Back
+                    </button>
+                </div>
+            </div>
 
-                    <button type="submit" class="create-btn" id="submitBtn">Create Expense & Generate Links</button>
-                </form>
-
-                <div id="successMessage" class="success-message" style="display: none;"></div>
+            <!-- Verification Screen -->
+            <div id="verificationScreen" class="auth-screen">
+                <div class="auth-header">
+                    <h2>Enter Verification Code</h2>
+                    <p id="verificationMessage">We sent a 6-digit code to your phone</p>
+                </div>
+                
+                <div class="content">
+                    <form id="verificationForm">
+                        <div class="form-group">
+                            <label for="verificationCode">Verification Code</label>
+                            <input type="text" id="verificationCode" placeholder="123456" maxlength="6" required>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn primary" id="verifyBtn">
+                            Verify & Continue
+                        </button>
+                    </form>
+                    
+                    <div class="auth-switch">
+                        <span>Didn't receive a code?</span>
+                        <button type="button" class="link-btn" onclick="resendCode()">
+                            Resend
+                        </button>
+                    </div>
+                    
+                    <button type="button" class="link-btn" onclick="showAuthForm()">
+                        ← Back
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- History View -->
-        <div id="history" class="view">
-            <div class="content">
-                <div id="expenseHistory" class="loading">Loading expenses...</div>
+        <!-- Main App (shown when logged in) -->
+        <div id="mainApp" class="main-app" style="display: none;">
+            <div class="header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>SplitEase</h1>
+                        <p>Split expenses without the hassle</p>
+                    </div>
+                    <button class="link-btn" onclick="logout()" style="color: white; font-size: 12px;">
+                        Logout
+                    </button>
+                </div>
             </div>
-        </div>
+            
+            <div class="status">
+                <span id="userWelcome">Welcome back!</span>
+            </div>
 
-        <!-- Settle Up View -->
-        <div id="settle" class="view">
-            <div class="content">
-                <div id="settleUpContent">
-                    <div class="empty-state">
-                        <h3>💰 Settlement Calculator</h3>
-                        <p>This feature will calculate who owes what to whom and suggest the minimum number of transactions needed to settle all debts.</p>
-                        <p><strong>Coming in the next update!</strong></p>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('create', this)">Create</button>
+                <button class="tab" onclick="switchTab('history', this)">History</button>
+                <button class="tab" onclick="switchTab('settle', this)">Settle Up</button>
+            </div>
+
+            <!-- Create Expense View -->
+            <div id="create" class="view active">
+                <div class="content">
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="description">What's this expense for?</label>
+                            <input type="text" id="description" placeholder="Dinner, groceries, movie tickets..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount">Total Amount ($)</label>
+                            <input type="number" id="amount" step="0.01" placeholder="0.00" required min="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="splitType">How to split?</label>
+                            <select id="splitType" onchange="updateSplitType()">
+                                <option value="equal">Split equally</option>
+                                <option value="percentage">By percentage</option>
+                                <option value="amount">By specific amounts</option>
+                            </select>
+                        </div>
+
+                        <div class="participants">
+                            <label>Who are you splitting with? <span class="helper-text">(People who owe money)</span></label>
+                            <div id="participantsList">
+                                <div class="participant">
+                                    <input type="text" placeholder="Name" required>
+                                    <input type="email" placeholder="Email (optional)">
+                                    <div class="amount">$0.00</div>
+                                </div>
+                            </div>
+                            <button type="button" class="add-participant" onclick="addParticipant()">+ Add Person</button>
+                        </div>
+
+                        <button type="submit" class="create-btn" id="submitBtn">Create Expense & Generate Links</button>
+                    </form>
+
+                    <div id="successMessage" class="success-message" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- History View -->
+            <div id="history" class="view">
+                <div class="content">
+                    <div id="expenseHistory" class="loading">Loading expenses...</div>
+                </div>
+            </div>
+
+            <!-- Settle Up View -->
+            <div id="settle" class="view">
+                <div class="content">
+                    <div id="settleUpContent">
+                        <div class="empty-state">
+                            <h3>Settlement Calculator</h3>
+                            <p>This feature will calculate who owes what to whom and suggest the minimum number of transactions needed to settle all debts.</p>
+                            <p><strong>Coming in the next update!</strong></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -463,7 +700,180 @@
         // API Configuration - points to your live backend!
         const API_BASE = window.location.origin + '/api';
         
-        let expenses = [];
+        // Authentication state
+        let currentUser = null;
+        let authToken = null;
+        let isSignupMode = true;
+        let pendingContact = null;
+
+        // Authentication functions
+        function showWelcome() {
+            hideAllAuthScreens();
+            document.getElementById('welcomeScreen').classList.add('active');
+        }
+
+        function showAuthForm(mode = 'signup') {
+            isSignupMode = mode === 'signup';
+            hideAllAuthScreens();
+            document.getElementById('authFormScreen').classList.add('active');
+            
+            // Update UI based on mode
+            if (isSignupMode) {
+                document.getElementById('authTitle').textContent = 'Create Account';
+                document.getElementById('authSubtitle').textContent = 'Enter your phone number or email to get started';
+                document.getElementById('nameGroup').style.display = 'block';
+                document.getElementById('authName').required = true; // Add required back
+                document.getElementById('authSubmitBtn').textContent = 'Send Verification Code';
+                document.getElementById('authSwitchText').textContent = 'Already have an account?';
+                document.getElementById('authSwitchBtn').textContent = 'Sign In';
+            } else {
+                document.getElementById('authTitle').textContent = 'Welcome Back';
+                document.getElementById('authSubtitle').textContent = 'Enter your phone number or email to sign in';
+                document.getElementById('nameGroup').style.display = 'none';
+                document.getElementById('authName').required = false; // Remove required
+                document.getElementById('authSubmitBtn').textContent = 'Send Verification Code';
+                document.getElementById('authSwitchText').textContent = "Don't have an account?";
+                document.getElementById('authSwitchBtn').textContent = 'Sign Up';
+            }
+            
+            // Clear form
+            document.getElementById('authForm').reset();
+        }
+
+        function toggleAuthMode() {
+            showAuthForm(isSignupMode ? 'login' : 'signup');
+        }
+
+        function showVerification(contact, contactType) {
+            hideAllAuthScreens();
+            document.getElementById('verificationScreen').classList.add('active');
+            
+            const message = contactType === 'phone' 
+                ? `We sent a 6-digit code to ${contact}`
+                : `We sent a 6-digit code to ${contact}`;
+            document.getElementById('verificationMessage').textContent = message;
+            
+            // Clear verification form
+            document.getElementById('verificationForm').reset();
+        }
+
+        function hideAllAuthScreens() {
+            document.querySelectorAll('.auth-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        async function requestVerificationCode(contact, name = null) {
+            try {
+                const response = await fetch(`${API_BASE}/auth/request-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contact,
+                        name,
+                        isSignup: isSignupMode
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    pendingContact = contact;
+                    showVerification(contact, data.contactType);
+                    return true;
+                } else {
+                    alert(data.error || 'Failed to send verification code');
+                    return false;
+                }
+            } catch (error) {
+                alert('Network error. Please try again.');
+                return false;
+            }
+        }
+
+        async function verifyCode(contact, code) {
+            try {
+                const response = await fetch(`${API_BASE}/auth/verify-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact, code })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store authentication data
+                    authToken = data.token;
+                    currentUser = data.user;
+                    
+                    // Store in localStorage for persistence
+                    localStorage.setItem('splitease_token', authToken);
+                    localStorage.setItem('splitease_user', JSON.stringify(currentUser));
+                    
+                    // Show main app
+                    showMainApp();
+                    return true;
+                } else {
+                    alert(data.error || 'Invalid verification code');
+                    return false;
+                }
+            } catch (error) {
+                alert('Network error. Please try again.');
+                return false;
+            }
+        }
+
+        function showMainApp() {
+            document.getElementById('authScreens').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Update welcome message
+            document.getElementById('userWelcome').textContent = `Welcome back, ${currentUser.name}!`;
+            
+            // Load user's expenses
+            loadExpenseHistory();
+        }
+
+        function logout() {
+            // Clear authentication data
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('splitease_token');
+            localStorage.removeItem('splitease_user');
+            
+            // Show auth screens
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('authScreens').style.display = 'block';
+            showWelcome();
+        }
+
+        async function resendCode() {
+            if (pendingContact) {
+                const name = isSignupMode ? document.getElementById('authName').value : null;
+                await requestVerificationCode(pendingContact, name);
+            }
+        }
+
+        // Check for existing authentication on page load
+        function checkExistingAuth() {
+            const token = localStorage.getItem('splitease_token');
+            const user = localStorage.getItem('splitease_user');
+            
+            if (token && user) {
+                try {
+                    authToken = token;
+                    currentUser = JSON.parse(user);
+                    showMainApp();
+                } catch (error) {
+                    // Invalid stored data, clear it
+                    localStorage.removeItem('splitease_token');
+                    localStorage.removeItem('splitease_user');
+                    showWelcome();
+                }
+            } else {
+                showWelcome();
+            }
+        }
 
         // Tab switching function
         function switchTab(tabName, tabElement) {
@@ -504,6 +914,8 @@
             if (participantsList.children.length > 1) {
                 button.parentElement.remove();
                 updateParticipantAmounts();
+            } else {
+                alert('You need at least one person to split with!');
             }
         }
 
@@ -519,7 +931,10 @@
             const participants = document.querySelectorAll('.participant');
             
             if (splitType === 'equal' && participants.length > 0) {
-                const amountPerPerson = amount / participants.length;
+                // Include yourself in the split calculation
+                const totalPeople = participants.length + 1; // +1 for you
+                const amountPerPerson = amount / totalPeople;
+                
                 participants.forEach(participant => {
                     const amountDiv = participant.querySelector('.amount');
                     amountDiv.textContent = `$${amountPerPerson.toFixed(2)}`;
@@ -527,7 +942,7 @@
             }
         }
 
-        // Create expense function
+        // Create expense function (updated with authentication)
         async function createExpense(expenseData) {
             try {
                 console.log('Creating expense:', expenseData);
@@ -535,11 +950,17 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify(expenseData)
                 });
                 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        // Token expired, logout user
+                        logout();
+                        return;
+                    }
                     const errorText = await response.text();
                     console.error('API Error:', errorText);
                     throw new Error(`Failed to create expense: ${response.status}`);
@@ -554,17 +975,26 @@
             }
         }
 
-        // Load expense history
+        // Load expense history (updated with authentication)
         async function loadExpenseHistory() {
             try {
                 console.log('Loading expense history...');
-                const response = await fetch(`${API_BASE}/expenses`);
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
                 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const expenses = await response.json();
+                const data = await response.json();
+                const expenses = data.expenses || [];
                 console.log('Loaded expenses:', expenses);
                 
                 const historyDiv = document.getElementById('expenseHistory');
@@ -583,10 +1013,10 @@
                     <div class="expense-item">
                         <div class="expense-header">
                             <div class="expense-title">${expense.description}</div>
-                            <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
+                            <div class="expense-amount">${expense.amount.toFixed(2)}</div>
                         </div>
                         <div class="expense-details">
-                            Split among ${expense.participants.length} people • ${new Date(expense.createdAt).toLocaleDateString()}
+                            Split among ${expense.participants.length + 1} people • ${new Date(expense.createdAt).toLocaleDateString()}
                         </div>
                         <div class="payment-links">
                             ${expense.participants.map(p => `
@@ -595,7 +1025,7 @@
                                         <div class="name">${p.name}</div>
                                         ${p.email ? `<div class="email">${p.email}</div>` : ''}
                                     </div>
-                                    <div class="amount">$${p.amount.toFixed(2)}</div>
+                                    <div class="amount">${p.amount.toFixed(2)}</div>
                                     <button class="copy-link" onclick="copyPaymentLink('${p.paymentLink}', this)">Copy Link</button>
                                 </div>
                             `).join('')}
@@ -638,6 +1068,39 @@
             });
         }
 
+        // Form event handlers
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const contact = document.getElementById('authContact').value.trim();
+            const name = isSignupMode ? document.getElementById('authName').value.trim() : null;
+            
+            if (!contact) {
+                alert('Please enter your phone number or email');
+                return;
+            }
+            
+            if (isSignupMode && !name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            await requestVerificationCode(contact, name);
+        });
+
+        document.getElementById('verificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('verificationCode').value.trim();
+            
+            if (!code || code.length !== 6) {
+                alert('Please enter the 6-digit verification code');
+                return;
+            }
+            
+            await verifyCode(pendingContact, code);
+        });
+
         // Handle form submission
         document.getElementById('expenseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -666,7 +1129,7 @@
                 }).filter(p => p.name);
                 
                 if (participants.length === 0) {
-                    alert('Please add at least one participant with a name');
+                    alert('Please add at least one person you\'re splitting with');
                     return;
                 }
                 
@@ -694,7 +1157,7 @@
                 const successDiv = document.getElementById('successMessage');
                 successDiv.innerHTML = `
                     <h3>✅ Expense Created Successfully!</h3>
-                    <p><strong>${description}</strong> for $${amount.toFixed(2)} has been split among ${participants.length} people.</p>
+                    <p><strong>${description}</strong> for ${amount.toFixed(2)} has been split among ${participants.length + 1} people.</p>
                     <p>Payment links have been generated! Check the <strong>History</strong> tab to copy and share them.</p>
                 `;
                 successDiv.style.display = 'block';
@@ -702,13 +1165,8 @@
                 // Reset form
                 e.target.reset();
                 
-                // Reset participants list to default (2 people)
+                // Reset participants list to default (1 person)
                 document.getElementById('participantsList').innerHTML = `
-                    <div class="participant">
-                        <input type="text" placeholder="Name" required>
-                        <input type="email" placeholder="Email (optional)">
-                        <div class="amount">$0.00</div>
-                    </div>
                     <div class="participant">
                         <input type="text" placeholder="Name" required>
                         <input type="email" placeholder="Email (optional)">
@@ -741,6 +1199,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('SplitEase app loaded');
             console.log('API Base URL:', API_BASE);
+            
+            // Check for existing authentication
+            checkExistingAuth();
+            
             updateParticipantAmounts();
         });
     </script>
